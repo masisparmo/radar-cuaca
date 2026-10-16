@@ -130,7 +130,7 @@ export class ControlsPanel {
                   <span class="control-title">Stasiun & Label Kota</span>
                 </div>
                 <label class="toggle-switch">
-                  <input type="checkbox" id="toggle-station-layer">
+                  <input type="checkbox" id="toggle-station-layer" checked>
                   <span class="slider round"></span>
                 </label>
               </div>
