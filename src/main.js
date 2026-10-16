@@ -28,6 +28,11 @@ class RadarCuacaApp {
 
     // 1. Initialize Map
     this.mapController = new MapController('map-container');
+    setTimeout(() => {
+      if (this.mapController && this.mapController.map) {
+        this.mapController.map.invalidateSize();
+      }
+    }, 200);
 
     // 2. Initialize Smoke Plume Heatmap Layer
     this.smokeLayer = new SmokePlumeLayer({ active: true, opacity: 0.82 });
@@ -192,9 +197,9 @@ class RadarCuacaApp {
       const enrichedStations = await airQualityService.loadRegionalStations(REGIONAL_STATIONS);
       this.mapController.renderStations(enrichedStations);
 
-      // Check whether stations toggle is checked (default is off)
+      // Check whether stations toggle is checked (default is on)
       const chkStation = document.getElementById('toggle-station-layer');
-      this.mapController.toggleStations(chkStation ? chkStation.checked : false);
+      this.mapController.toggleStations(chkStation ? chkStation.checked : true);
 
       if (this.smokeLayer) {
         this.smokeLayer.updateStations(enrichedStations);
