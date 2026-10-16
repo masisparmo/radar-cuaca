@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RADAR CUACA • Pantau Titik Api Kebakaran & Kualitas Udara</title>
+  <meta name="description" content="Aplikasi pemantauan titik api aktif kebakaran hutan (NASA FIRMS) dan indeks kualitas udara (Open-Meteo) real-time ala Windy.com">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23EF4444'><circle cx='12' cy='12' r='10'/></svg>">
+  <script type="module" crossorigin src="/assets/index-D1LOsrA3.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-Cij-HzdI.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Main Interactive Map Canvas -->
+    <div id="map-container"></div>
+
+    <!-- Floating Search & Region Bar (Top Left) -->
+    <div id="top-search-wrap"></div>
+
+    <!-- Floating Sidebar & Controls (Right) -->
+    <div id="sidebar-container"></div>
+
+    <!-- Bottom Scale & AQI Legend Bar (Windy Style) -->
+    <div id="bottom-legend-bar">
+      <div class="legend-group">
+        <span class="legend-title">INDEKS KUALITAS UDARA (US AQI)</span>
+        <div class="legend-scale-bar">
+          <div class="scale-segment" style="background: #10B981;" title="Baik (0-50)"></div>
+          <div class="scale-segment" style="background: #FBBF24;" title="Sedang (51-100)"></div>
+          <div class="scale-segment" style="background: #F97316;" title="Sensitif (101-150)"></div>
+          <div class="scale-segment" style="background: #EF4444;" title="Tidak Sehat (151-200)"></div>
+          <div class="scale-segment" style="background: #A855F7;" title="Sangat Tidak Sehat (201-300)"></div>
+          <div class="scale-segment" style="background: #7F1D1D;" title="Berbahaya (300+)"></div>
+        </div>
+        <div class="legend-labels">
+          <span>0 Baik</span>
+          <span>100 Sedang</span>
+          <span>200 Bahaya</span>
+          <span>300+ Ekstrem</span>
+        </div>
+      </div>
+
+      <div class="legend-group">
+        <span class="legend-title">INTENSITAS API (NASA FIRMS)</span>
+        <div class="legend-scale-bar" style="width: 140px;">
+          <div class="scale-segment" style="background: #FDE047;" title="Rendah"></div>
+          <div class="scale-segment" style="background: #F97316;" title="Sedang"></div>
+          <div class="scale-segment" style="background: #EF4444;" title="Tinggi"></div>
+          <div class="scale-segment" style="background: #FFFFFF;" title="FRP Ekstrem"></div>
+        </div>
+        <div class="legend-labels">
+          <span>Rendah</span>
+          <span>Menengah</span>
+          <span>Intens</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Map Quick Tools (Zoom & GPS) -->
+    <div id="map-tools-wrap">
+      <button id="btn-zoom-in" class="map-tool-btn" title="Perbesar Peta">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button id="btn-zoom-out" class="map-tool-btn" title="Perkecil Peta">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button id="btn-locate-me" class="map-tool-btn" title="Lokasi Saya Saat Ini (GPS)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+      </button>
+    </div>
+
+    <!-- Inspector Modal / Drawer Container -->
+    <div id="modal-container"></div>
+  </div>
+
+</body>
+</html>
