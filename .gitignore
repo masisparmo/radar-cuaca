@@ -3,9 +3,10 @@ node_modules
 /.pnp
 .pnp.js
 
-# Production build
+# Production build & cache
 dist
 build
+.vite
 
 # Logs
 npm-debug.log*
