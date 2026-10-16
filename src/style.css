@@ -869,12 +869,12 @@ input:checked + .slider:before {
   transform: scale(1.05);
 }
 
-/* Inspector Modal / Bottom Sheet */
+/* Inspector Modal / Draggable Floating Card */
 .inspector-overlay {
-  position: absolute;
+  position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
+  background: transparent;
+  pointer-events: none;
   z-index: 800;
   display: flex;
   align-items: flex-end;
@@ -888,37 +888,80 @@ input:checked + .slider:before {
 }
 
 .inspector-drawer {
-  width: 100%;
-  max-width: 680px;
-  max-height: 85vh;
+  pointer-events: auto;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(680px, calc(100vw - 32px));
+  max-height: min(84vh, 850px);
   background: #0B0F19;
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-bottom: none;
-  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.8);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.inspector-drawer.is-dragging {
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.9), 0 0 0 2px #0284C7;
+  cursor: grabbing !important;
 }
 
 @keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from { transform: translate(-50%, 40px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
 }
 
 .drawer-header {
-  padding: 12px 20px 10px 20px;
+  padding: 10px 18px 10px 18px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.drawer-header:active,
+.inspector-drawer.is-dragging .drawer-header {
+  cursor: grabbing;
 }
 
 .drawer-drag-handle {
-  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 auto 6px auto;
+  padding: 3px 12px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.08);
+  width: fit-content;
+  transition: all 0.2s ease;
+  cursor: grab;
+}
+
+.drawer-drag-handle:hover {
+  background: rgba(2, 132, 199, 0.25);
+}
+
+.drawer-drag-pill {
+  width: 28px;
   height: 4px;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.2);
-  margin: 0 auto 10px auto;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.drawer-drag-hint {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .drawer-title-row {
@@ -944,6 +987,31 @@ input:checked + .slider:before {
 .drawer-subtitle {
   font-size: 12px;
   color: #94A3B8;
+}
+
+.drawer-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drawer-action-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #94A3B8;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.drawer-action-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #FFF;
 }
 
 .drawer-close-btn {
@@ -1472,8 +1540,12 @@ body.theme-light .map-tool-btn:hover {
 /* Inspector Drawer in light mode */
 body.theme-light .inspector-drawer {
   background: #FFFFFF;
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+}
+
+body.theme-light .inspector-drawer.is-dragging {
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.35), 0 0 0 2px #0284C7;
 }
 
 body.theme-light .drawer-title {
@@ -1481,7 +1553,29 @@ body.theme-light .drawer-title {
 }
 
 body.theme-light .drawer-drag-handle {
-  background: rgba(0, 0, 0, 0.18);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+body.theme-light .drawer-drag-handle:hover {
+  background: rgba(2, 132, 199, 0.15);
+}
+
+body.theme-light .drawer-drag-pill {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+body.theme-light .drawer-drag-hint {
+  color: #475569;
+}
+
+body.theme-light .drawer-action-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #64748B;
+}
+
+body.theme-light .drawer-action-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #0F172A;
 }
 
 body.theme-light .drawer-close-btn {

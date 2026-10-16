@@ -13,16 +13,27 @@ export class InspectorModal {
       <div id="inspector-overlay" class="inspector-overlay hidden">
         <div class="inspector-drawer">
           <div class="drawer-header">
-            <div class="drawer-drag-handle"></div>
+            <div class="drawer-drag-handle" title="Klik dan geser untuk memindahkan kotak">
+              <div class="drawer-drag-pill"></div>
+              <span class="drawer-drag-hint">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>
+                GESER KOTAK
+              </span>
+            </div>
             <div class="drawer-title-row">
               <div>
                 <span class="location-badge" id="insp-type">STASIUN PEMANTAU</span>
                 <h2 id="insp-title" class="drawer-title">Jakarta Pusat</h2>
                 <p id="insp-subtitle" class="drawer-subtitle">-6.21°, 106.85° • DKI Jakarta</p>
               </div>
-              <button id="insp-close-btn" class="drawer-close-btn" title="Tutup">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-              </button>
+              <div class="drawer-header-actions">
+                <button id="insp-reset-pos-btn" class="drawer-action-btn" title="Reset posisi ke tengah">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                </button>
+                <button id="insp-close-btn" class="drawer-close-btn" title="Tutup (Esc)">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -140,9 +151,21 @@ export class InspectorModal {
       </div>
     `;
 
+    this.drawerEl = this.container.querySelector('.inspector-drawer');
+    this.headerEl = this.container.querySelector('.drawer-header');
+    this.hasCustomPosition = false;
+
     document.getElementById('insp-close-btn').addEventListener('click', () => {
       this.close();
     });
+
+    const resetBtn = document.getElementById('insp-reset-pos-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.resetPosition();
+      });
+    }
 
     document.getElementById('inspector-overlay').addEventListener('click', (e) => {
       if (e.target.id === 'inspector-overlay') {
@@ -155,11 +178,140 @@ export class InspectorModal {
         this.close();
       }
     });
+
+    this.setupDraggable();
+  }
+
+  setupDraggable() {
+    const drawer = this.drawerEl;
+    const header = this.headerEl;
+    if (!drawer || !header) return;
+
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let initialLeft = 0;
+    let initialTop = 0;
+
+    const onPointerDown = (e) => {
+      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('a')) {
+        return;
+      }
+      if (e.button !== undefined && e.button !== 0) return;
+
+      isDragging = true;
+      drawer.classList.add('is-dragging');
+
+      const rect = drawer.getBoundingClientRect();
+      drawer.style.position = 'fixed';
+      drawer.style.left = `${rect.left}px`;
+      drawer.style.top = `${rect.top}px`;
+      drawer.style.right = 'auto';
+      drawer.style.bottom = 'auto';
+      drawer.style.transform = 'none';
+      drawer.style.margin = '0';
+
+      initialLeft = rect.left;
+      initialTop = rect.top;
+      startX = e.clientX;
+      startY = e.clientY;
+
+      try {
+        header.setPointerCapture(e.pointerId);
+      } catch (_) {}
+      e.preventDefault();
+    };
+
+    const onPointerMove = (e) => {
+      if (!isDragging) return;
+
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+
+      const drawerWidth = drawer.offsetWidth;
+      const winWidth = window.innerWidth;
+      const winHeight = window.innerHeight;
+
+      let targetLeft = initialLeft + deltaX;
+      let targetTop = initialTop + deltaY;
+
+      // Ensure header remains reachable on screen
+      const minLeft = Math.min(10, winWidth - drawerWidth);
+      const maxLeft = Math.max(10, winWidth - 60);
+      const minTop = 10;
+      const maxTop = Math.max(10, winHeight - 60);
+
+      targetLeft = Math.max(minLeft, Math.min(targetLeft, maxLeft));
+      targetTop = Math.max(minTop, Math.min(targetTop, maxTop));
+
+      drawer.style.left = `${targetLeft}px`;
+      drawer.style.top = `${targetTop}px`;
+      this.hasCustomPosition = true;
+    };
+
+    const onPointerUp = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      drawer.classList.remove('is-dragging');
+      try {
+        header.releasePointerCapture(e.pointerId);
+      } catch (_) {}
+    };
+
+    header.addEventListener('pointerdown', onPointerDown);
+    header.addEventListener('pointermove', onPointerMove);
+    header.addEventListener('pointerup', onPointerUp);
+    header.addEventListener('pointercancel', onPointerUp);
+
+    window.addEventListener('resize', () => {
+      if (this.hasCustomPosition) {
+        this.clampToBounds();
+      }
+    });
+  }
+
+  resetPosition() {
+    this.hasCustomPosition = false;
+    if (!this.drawerEl) return;
+    this.drawerEl.style.position = 'fixed';
+    this.drawerEl.style.bottom = '20px';
+    this.drawerEl.style.left = '50%';
+    this.drawerEl.style.top = 'auto';
+    this.drawerEl.style.right = 'auto';
+    this.drawerEl.style.transform = 'translateX(-50%)';
+  }
+
+  clampToBounds() {
+    if (!this.drawerEl || !this.hasCustomPosition) return;
+    const rect = this.drawerEl.getBoundingClientRect();
+    const winWidth = window.innerWidth;
+    const winHeight = window.innerHeight;
+
+    let left = rect.left;
+    let top = rect.top;
+
+    const minLeft = Math.min(10, winWidth - rect.width);
+    const maxLeft = Math.max(10, winWidth - 60);
+    const minTop = 10;
+    const maxTop = Math.max(10, winHeight - 60);
+
+    left = Math.max(minLeft, Math.min(left, maxLeft));
+    top = Math.max(minTop, Math.min(top, maxTop));
+
+    this.drawerEl.style.left = `${left}px`;
+    this.drawerEl.style.top = `${top}px`;
+  }
+
+  open() {
+    const overlay = document.getElementById('inspector-overlay');
+    if (overlay) overlay.classList.remove('hidden');
+    if (this.hasCustomPosition) {
+      this.clampToBounds();
+    }
   }
 
   showStation(station, airData) {
-    const overlay = document.getElementById('inspector-overlay');
-    overlay.classList.remove('hidden');
+    this.open();
 
     document.getElementById('insp-type').textContent = 'STASIUN PEMANTAU UDARA';
     document.getElementById('insp-title').textContent = station.name;
@@ -169,8 +321,7 @@ export class InspectorModal {
   }
 
   showCoordinate(lat, lon, airData, customTitle = null) {
-    const overlay = document.getElementById('inspector-overlay');
-    overlay.classList.remove('hidden');
+    this.open();
 
     document.getElementById('insp-type').textContent = 'INSPEKSI KOORDINAT';
     document.getElementById('insp-title').textContent = customTitle || `Koordinat [${lat.toFixed(2)}°, ${lon.toFixed(2)}°]`;
@@ -180,8 +331,7 @@ export class InspectorModal {
   }
 
   showFireHotspot(fire, airData = null) {
-    const overlay = document.getElementById('inspector-overlay');
-    overlay.classList.remove('hidden');
+    this.open();
 
     document.getElementById('insp-type').textContent = '🔥 TITIK API SATELIT NASA';
     document.getElementById('insp-title').textContent = `Hotspot ${fire.region} (${fire.confidence})`;
