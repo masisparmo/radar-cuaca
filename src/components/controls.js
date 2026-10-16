@@ -130,7 +130,7 @@ export class ControlsPanel {
                   <span class="control-title">Stasiun & Label Kota</span>
                 </div>
                 <label class="toggle-switch">
-                  <input type="checkbox" id="toggle-station-layer" checked>
+                  <input type="checkbox" id="toggle-station-layer">
                   <span class="slider round"></span>
                 </label>
               </div>
@@ -141,11 +141,11 @@ export class ControlsPanel {
           <div class="controls-section">
             <h3 class="section-heading">GAYA PETA DASAR</h3>
             <div class="basemap-grid">
-              <button class="basemap-btn active" data-style="dark">
+              <button class="basemap-btn" data-style="dark">
                 <div class="basemap-preview bg-dark-preview"></div>
                 <span>Mode Gelap</span>
               </button>
-              <button class="basemap-btn" data-style="light">
+              <button class="basemap-btn active" data-style="light">
                 <div class="basemap-preview bg-light-preview"></div>
                 <span>Mode Terang</span>
               </button>

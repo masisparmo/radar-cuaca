@@ -83,8 +83,8 @@ class RadarCuacaApp {
       }
     );
 
-    // 10. Initialize Theme Mode (Dark / Light)
-    this.currentTheme = localStorage.getItem('theme_mode') || 'dark';
+    // 10. Initialize Theme Mode (Default to Light Mode)
+    this.currentTheme = localStorage.getItem('theme_mode') || 'light';
 
     // 11. Initialize Sidebar Controls
     this.controlsPanel = new ControlsPanel(
@@ -121,7 +121,7 @@ class RadarCuacaApp {
       }
     );
 
-    // Apply initial theme
+    // Apply initial theme (Light Mode default)
     this.applyTheme(this.currentTheme);
 
     // 12. Bind Map Tools (Zoom & GPS Locate)
@@ -191,6 +191,11 @@ class RadarCuacaApp {
     try {
       const enrichedStations = await airQualityService.loadRegionalStations(REGIONAL_STATIONS);
       this.mapController.renderStations(enrichedStations);
+
+      // Check whether stations toggle is checked (default is off)
+      const chkStation = document.getElementById('toggle-station-layer');
+      this.mapController.toggleStations(chkStation ? chkStation.checked : false);
+
       if (this.smokeLayer) {
         this.smokeLayer.updateStations(enrichedStations);
       }

@@ -9,7 +9,7 @@ export class MapController {
     this.options = options;
     this.map = null;
     this.tileLayers = {};
-    this.activeBaseLayer = 'dark';
+    this.activeBaseLayer = 'light';
     this.stationMarkers = [];
     this.stationsLayerGroup = L.layerGroup();
     this.onSelectStation = null;
@@ -67,8 +67,8 @@ export class MapController {
       attribution: 'OpenStreetMap'
     });
 
-    this.tileLayers.dark.addTo(this.map);
-    this.stationsLayerGroup.addTo(this.map);
+    // Default to Light Mode basemap; stationsLayerGroup starts OFF
+    this.tileLayers.light.addTo(this.map);
 
     this.bindMapEvents();
   }
@@ -98,13 +98,13 @@ export class MapController {
       const temp = st.temperature !== undefined ? `${st.temperature}°` : '';
       const aqi = st.aqi !== undefined ? st.aqi : '--';
 
-      // Custom Windy-styled city badge HTML
+      // Custom Windy-styled city badge HTML with clear AQI indicator
       const html = `
-        <div class="city-marker-badge" data-id="${st.id}">
+        <div class="city-marker-badge" data-id="${st.id}" title="Stasiun ${st.name}: Suhu ${temp}, Indeks Kualitas Udara US AQI ${aqi} (${aqiCat.label})">
           <span class="city-name">${st.name}</span>
           <span class="city-temp">${temp}</span>
           <span class="city-aqi-pill" style="background-color: ${aqiCat.color};">
-            ${aqi}
+            AQI ${aqi}
           </span>
         </div>
       `;
